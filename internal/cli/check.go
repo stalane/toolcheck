@@ -61,7 +61,7 @@ func runCheck(ctx context.Context, args []string, stdout, stderr io.Writer) int 
 		fmt.Fprintf(stderr, "toolcheck: %v\n", err)
 		return 1
 	}
-	printTools(stdout, tools, true)
+	printTools(stdout, tools, true, true)
 	return 0
 }
 
@@ -118,19 +118,22 @@ func runList(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		fmt.Fprintln(stdout, "no tools detected; run toolcheck check")
 		return 0
 	}
-	printTools(stdout, filtered, false)
+	printTools(stdout, filtered, false, false)
 	return 0
 }
 
-func printTools(w io.Writer, tools []store.Tool, onlyUpdates bool) {
+func printTools(w io.Writer, tools []store.Tool, onlyUpdates, activeOnly bool) {
 	header := fmt.Sprintf("%-14s %-18s %-18s %-18s %-10s %-8s", "TOOL", "INSTALLED", "LATEST", "ORIGIN", "MANAGED", "STATE")
 	fmt.Fprintln(w, header)
 	rows := 0
 	for _, tool := range tools {
-		state := present.State(tool)
-		if onlyUpdates && state != present.StateUpdate {
+		if activeOnly && !tool.Active {
 			continue
 		}
+		if onlyUpdates && (!present.UpdateAvailable(tool) || present.SystemManaged(tool)) {
+			continue
+		}
+		state := present.State(tool)
 		latest := tool.LatestVersion
 		if latest == "" {
 			latest = "—"
