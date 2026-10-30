@@ -1,0 +1,36 @@
+version: 2
+
+project_name: toolcheck
+
+builds:
+  - id: toolcheck
+    main: ./cmd/toolcheck
+    binary: toolcheck
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/stalane/toolcheck/internal/version.Version={{.Tag}}
+
+archives:
+  - formats:
+      - tar.gz
+    files:
+      - LICENSE
+      - README.md
+      - SECURITY.md
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+
+release:
+  github:
+    owner: stalane
+    name: toolcheck

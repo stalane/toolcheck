@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>toolcheck — settings</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-row">
+        <h1>Settings</h1>
+        <p class="sub">Where toolcheck keeps its data and how it checks.</p>
+      </div>
+      <div class="status"><a class="pill" href="/">← dashboard</a></div>
+    </header>
+
+    <section class="panel">
+      <h2>Paths</h2>
+      <table>
+        <tbody>
+          <tr><th>Config</th><td class="mono muted">{{.ConfigPath}}</td></tr>
+          <tr><th>Data directory</th><td class="mono muted">{{.DataDir}}</td></tr>
+          <tr><th>Database</th><td class="mono muted">{{.DBPath}}</td></tr>
+          <tr><th>Listening on</th><td class="mono muted">{{.Addr}}</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel spaced">
+      <h2>Check schedule</h2>
+      <table>
+        <tbody>
+          <tr><th>Interval</th><td class="mono">{{.Interval}}</td></tr>
+          <tr><th>Cache TTL</th><td class="mono">{{.CacheTTL}}</td></tr>
+          <tr><th>Node channel</th><td class="mono">{{.NodeChannel}}</td></tr>
+          <tr><th>Minimum release age</th><td class="mono">{{.MinReleaseAge}}</td></tr>
+          <tr><th>Updates enabled</th><td class="mono">{{if .UpdatesOn}}yes{{else}}no{{end}}</td></tr>
+          <tr><th>Last check</th><td class="mono">{{.LastCheck}}</td></tr>
+        </tbody>
+      </table>
+
+      <div class="actions">
+        <form method="post" action="/check">
+          <input type="hidden" name="csrf" value="{{.CSRF}}" />
+          <button class="btn primary" type="submit">Check now</button>
+        </form>
+      </div>
+      <p class="note">Edit the YAML config above and restart the service to change these values. toolcheck never uses sudo and never updates apt-managed tools.</p>
+    </section>
+  </div>
+</body>
+</html>

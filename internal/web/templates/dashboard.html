@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>toolcheck — installed tools</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-row">
+        <h1>toolcheck</h1>
+        <p class="sub">Package managers and runtimes installed outside apt, checked against upstream releases.</p>
+      </div>
+      <div class="status">
+        <span class="pill live">● LOCAL</span>
+        <span class="pill">{{.UpdateCount}} updates</span>
+        <form method="post" action="/check" class="inline-form">
+          <input type="hidden" name="csrf" value="{{.CSRF}}" />
+          <button class="pill button-pill" type="submit">Check now</button>
+        </form>
+        <a class="pill" href="/activity">Activity</a>
+        <a class="pill" href="/settings">Settings</a>
+      </div>
+    </header>
+
+    {{if .Message}}<div class="flash">{{.Message}}</div>{{end}}
+    {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
+
+    <section class="kpis">
+      <div class="kpi"><div class="kpi-label">Updates available</div><div class="kpi-value gold">{{.UpdateCount}}</div></div>
+      <div class="kpi"><div class="kpi-label">Alert only</div><div class="kpi-value">{{.AlertCount}}</div></div>
+      <div class="kpi"><div class="kpi-label">System / manual</div><div class="kpi-value">{{.ManagedCount}}</div></div>
+      <div class="kpi"><div class="kpi-label">Last check</div><div class="kpi-value small">{{.LastCheck}}</div></div>
+    </section>
+
+    <section class="panel">
+      <h2>Installed tools</h2>
+      <div class="asof">{{.Total}} detected · updateable rows have a safe adapter</div>
+      {{if .Tools}}
+      <table>
+        <thead>
+          <tr><th>Tool</th><th>Installed</th><th>Latest</th><th>Origin</th><th>State</th><th></th></tr>
+        </thead>
+        <tbody>
+          {{range .Tools}}
+          <tr>
+            <td>
+              <strong>{{.Name}}</strong>
+              {{if .Security}}<span class="badge kev">SECURITY</span>{{end}}
+              <div class="muted">{{.Family}} · {{.Path}}{{if not .Active}} · inactive{{end}}</div>
+            </td>
+            <td class="mono">{{.Version}}</td>
+            <td class="mono {{if .UpdateAvailable}}gold-text{{end}}">{{.Latest}}</td>
+            <td><span class="badge">{{.Origin}}</span></td>
+            <td>
+              <span class="badge {{.State}}">{{.State}}</span>
+              {{if and .UpdateAvailable (not .Updateable)}}<div class="muted">alert only</div>{{end}}
+            </td>
+            <td class="right"><a class="pill" href="/tool/{{.ID}}">view</a></td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      {{else}}
+      <p class="muted">No tools detected yet. Run <code>toolcheck check</code> or press <strong>Check now</strong>.</p>
+      {{end}}
+    </section>
+  </div>
+</body>
+</html>

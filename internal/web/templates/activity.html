@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>toolcheck — activity</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-row">
+        <h1>Activity</h1>
+        <p class="sub">Recent checks and update runs.</p>
+      </div>
+      <div class="status"><a class="pill" href="/">← dashboard</a></div>
+    </header>
+
+    <section class="panel">
+      <h2>Checks</h2>
+      {{if .Checks}}
+      <table>
+        <thead><tr><th>Finished</th><th>Status</th><th>Tools</th><th>Updates</th><th>Error</th></tr></thead>
+        <tbody>
+          {{range .Checks}}
+          <tr>
+            <td class="muted">{{.Finished}}</td>
+            <td><span class="badge {{.Status}}">{{.Status}}</span></td>
+            <td>{{.Tools}}</td>
+            <td>{{.Updates}}</td>
+            <td class="muted">{{.Error}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      {{else}}
+      <p class="muted">No checks yet. Run <code>toolcheck check</code>.</p>
+      {{end}}
+    </section>
+
+    <section class="panel spaced">
+      <h2>Update runs</h2>
+      {{if .Updates}}
+      <table>
+        <thead><tr><th>Started</th><th>Tool</th><th>Change</th><th>Status</th><th>Command</th></tr></thead>
+        <tbody>
+          {{range .Updates}}
+          <tr>
+            <td class="muted">{{.Started}}</td>
+            <td>{{.Tool}}</td>
+            <td class="mono">{{.From}} → {{.To}}</td>
+            <td><span class="badge {{.Status}}">{{.Status}}</span></td>
+            <td class="mono muted">{{.Command}}{{if .Output}}<div class="output">{{.Output}}</div>{{end}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      {{else}}
+      <p class="muted">No update runs yet.</p>
+      {{end}}
+    </section>
+  </div>
+</body>
+</html>

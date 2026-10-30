@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>toolcheck — {{.Tool.Name}}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand-row">
+        <h1>{{.Tool.Name}}</h1>
+        <p class="sub">{{.Tool.Family}} · installed {{.Tool.Version}}{{if .Tool.Latest}} · latest {{.Tool.Latest}}{{end}}</p>
+      </div>
+      <div class="status">
+        <span class="badge {{.Tool.State}}">{{.Tool.State}}</span>
+        {{if .Tool.Security}}<span class="pill kev-pill">● SECURITY RELEASE</span>{{end}}
+        <a class="pill" href="/">← dashboard</a>
+      </div>
+    </header>
+
+    {{if .Message}}<div class="flash">{{.Message}}</div>{{end}}
+    {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
+
+    <section class="panel">
+      <h2>Details</h2>
+      <div class="asof">{{.Tool.Origin}} install · managed by {{.Tool.ManagedBy}}</div>
+      <table>
+        <tbody>
+          <tr><th>Installed</th><td class="mono">{{.Tool.Version}}</td></tr>
+          <tr><th>Latest upstream</th><td class="mono {{if .Tool.UpdateAvailable}}gold-text{{end}}">{{.Tool.Latest}}</td></tr>
+          <tr><th>Released</th><td class="muted">{{if .Tool.Published}}{{.Tool.Published}} · {{.Tool.Age}}{{else}}unknown{{end}}</td></tr>
+          <tr><th>Command</th><td class="mono">{{.Tool.Path}}</td></tr>
+          <tr><th>Real path</th><td class="mono muted">{{.Tool.RealPath}}</td></tr>
+          <tr><th>Writable</th><td class="muted">{{if .Tool.Updateable}}yes, safe update adapter{{else}}{{if .Tool.System}}managed by apt/external package manager{{else}}alert only{{end}}{{end}}</td></tr>
+        </tbody>
+      </table>
+
+      {{if .Tool.Hint}}<p class="note">{{.Tool.Hint}}</p>{{end}}
+
+      <div class="actions">
+        {{if .Tool.Updateable}}
+        <form method="post" action="/tool/{{.Tool.ID}}/update">
+          <input type="hidden" name="csrf" value="{{.CSRF}}" />
+          <button class="btn primary" type="submit" onclick="return confirm('Update {{.Tool.Name}} from {{.Tool.Version}} to {{.Tool.Latest}}?')">Update to {{.Tool.Latest}}</button>
+        </form>
+        {{else if .Tool.UpdateAvailable}}
+        <span class="note">This tool is alert-only. Update it with its own installer or version manager; see the note above.</span>
+        {{else if .Tool.System}}
+        <span class="note">This tool is managed by apt or an external package manager. Leave it to that package manager.</span>
+        {{else}}
+        <span class="note">Up to date.</span>
+        {{end}}
+      </div>
+    </section>
+
+    <section class="panel spaced">
+      <h2>Update history</h2>
+      {{if .Updates}}
+      <table>
+        <thead><tr><th>Started</th><th>Change</th><th>Status</th><th>Command</th></tr></thead>
+        <tbody>
+          {{range .Updates}}
+          <tr>
+            <td class="muted">{{.Started}}</td>
+            <td class="mono">{{.From}} → {{.To}}</td>
+            <td><span class="badge {{.Status}}">{{.Status}}</span></td>
+            <td class="mono muted">{{.Command}}{{if .Output}}<div class="output">{{.Output}}</div>{{end}}</td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+      {{else}}
+      <p class="muted">No updates run by toolcheck yet.</p>
+      {{end}}
+    </section>
+  </div>
+</body>
+</html>
